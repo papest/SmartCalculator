@@ -6,6 +6,7 @@ fun main() {
             when (this) {
                 "/exit" -> "Bye!"
                 "" -> ""
+                "/help" -> "The program calculates the sum of numbers"
                 else ->
                     this.split(" ")
                         .sumOf { it.toInt() }
