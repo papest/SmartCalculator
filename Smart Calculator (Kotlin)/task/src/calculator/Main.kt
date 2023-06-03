@@ -1,8 +1,17 @@
 package calculator
 
 fun main() {
-    readln()
-        .split(" ")
-        .sumOf { it.toInt() }
-        .let { println(it) }
+
+    while (with(readln()) {
+            when (this) {
+                "/exit" -> "Bye!"
+                "" -> ""
+                else ->
+                    this.split(" ")
+                        .sumOf { it.toInt() }
+            }
+        }.apply {
+            if (this != "") println(this)
+        } != "Bye!") {
+    }
 }
