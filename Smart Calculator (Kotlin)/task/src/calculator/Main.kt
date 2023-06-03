@@ -6,9 +6,13 @@ fun main() {
             when (this) {
                 "/exit" -> "Bye!"
                 "" -> ""
-                "/help" -> "The program calculates the sum of numbers"
+                "/help" -> "The program calculates the sum an sub of numbers"
                 else ->
-                    this.split(" ")
+                    replace("+", "")
+                        .replace("--", "")
+                        .replace("^\\s+".toRegex(), "")
+                        .replace("-\\s+".toRegex(), "-")
+                        .split("\\s+".toRegex())
                         .sumOf { it.toInt() }
             }
         }.apply {
