@@ -3,10 +3,12 @@ package calculator
 fun main() {
 
     while (with(readln()) {
-            when (this) {
-                "/exit" -> "Bye!"
-                "" -> ""
-                "/help" -> "The program calculates the sum an sub of numbers"
+            when {
+                this == "/exit" -> "Bye!"
+                isEmpty() -> ""
+                this == "/help" -> "The program calculates the sum an sub of numbers"
+                matches("\\s*/.*".toRegex()) -> "Unknown command"
+                !matches("\\s*[-+]?\\s*\\d+\\s*(([+-]+\\s*\\d+\\s*)?)*".toRegex()) -> "Invalid expression"
                 else ->
                     replace("+", "")
                         .replace("--", "")
@@ -18,5 +20,10 @@ fun main() {
         }.apply {
             if (this != "") println(this)
         } != "Bye!") {
+
+        /**
+         * There will be advertising
+         */
+
     }
 }
