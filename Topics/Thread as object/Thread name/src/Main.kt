@@ -1,0 +1,1 @@
+fun getThreadName(thread: Thread): String = thread.name
