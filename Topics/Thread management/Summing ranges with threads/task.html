@@ -1,0 +1,9 @@
+<h2>Summing ranges with threads</h2>
+<html>
+ <head></head>
+ <body>
+  <p></p> 
+  <p>The following code is supposed to find the general sum of two inclusive integer ranges in parallel. Unfortunately, this code doesn't work correctly. Try and fix it. Read the comments for a better understanding.</p> 
+  <p><strong>Additional explanations:</strong> the implemented class <code class="java">RangeSummator</code> extends <code class="java">Thread</code> and overrides the method <code class="java">run</code>. It sums the range passed to the constructor (left and right limits as integers). The class has a field <code class="java">result</code> that returns the calculated sum or <code class="java">0</code> if the thread has not calculated the sum yet.</p>
+ </body>
+</html><br><b>Sample Input:</b><br><pre><code class="language-no-highlight">1 5<br>2 4</code></pre><br><b>Sample Output:</b><br><pre><code class="language-no-highlight">24</code></pre><br><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br>
