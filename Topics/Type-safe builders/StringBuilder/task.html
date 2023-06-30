@@ -1,0 +1,27 @@
+<h2>StringBuilder</h2>
+<html>
+ <head></head>
+ <body>
+  <p></p> 
+  <p>We have the following code:</p> 
+  <pre><code class="language-kotlin">class StringBuilderWrapper {
+    private val stringBuilder = StringBuilder()
+
+    fun append(value: String) {
+        stringBuilder.append(value)
+    }
+
+    fun newline() {
+        stringBuilder.appendln()
+    }
+
+    fun build(): String {
+        return stringBuilder.toString()
+    }
+}</code></pre> 
+  <p>Please code the <code class="language-kotlin">buildString</code> function that serves as the entry point for constructing a string using the type-safe builder. It takes a lambda with a receiver (<code class="language-kotlin">StringBuilderWrapper.() -&gt; Unit</code>) that defines the operations to be performed on the builder. </p>
+ </body>
+</html><br><b>Sample Input:</b><br><pre><code class="language-no-highlight">8 11<br></code></pre><br><b>Sample Output:</b><br><pre><code class="language-no-highlight">8<br>11</code></pre><br><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br>
+<b>Caution</b><br><br>
+You may see errors in your code or execution results due to missing context. Don’t worry about it, just write the solution and press Check.
+<br><br>

@@ -1,0 +1,23 @@
+<h2>The Mandalorian</h2>
+<html>
+ <head></head>
+ <body>
+  <p></p> 
+  <p>The Mandalorian is managing ships for a battle against the enemies trying to take over Grogu. Together with Grogu, he has coded a type-safe builder to prepare the ship design:</p> 
+  <pre><code class="language-kotlin">data class Ship(val name: String, val ammunition: Int)
+
+class ShipBuilder {
+   // Write your code here
+}
+
+fun buildShip(block: ShipBuilder.() -&gt; Unit): Ship {
+    val builder = ShipBuilder()
+    builder.block()
+    return builder.build()
+}</code></pre> 
+  <p>Please use your force and complete the builder using the <code class="language-kotlin">buildShip</code> function to create the ships for the combat.</p>
+ </body>
+</html><br><b>Sample Input:</b><br><pre><code class="language-no-highlight">Ford-11 Bismarck-20 Titanic-34 HMS-44<br></code></pre><br><b>Sample Output:</b><br><pre><code class="language-no-highlight">[Ship(name=Ford, ammunition=11), Ship(name=Bismarck, ammunition=20), Ship(name=Titanic, ammunition=34), Ship(name=HMS, ammunition=44)]</code></pre><br><br><br><font color="gray">Memory limit: 256 MB</font><br><font color="gray">Time limit: 8 seconds</font><br><br>
+<b>Caution</b><br><br>
+You may see errors in your code or execution results due to missing context. Don’t worry about it, just write the solution and press Check.
+<br><br>
