@@ -1,16 +1,21 @@
 package calculator
 
+import java.math.BigInteger
 import java.util.regex.Pattern as P
 
 fun main() {
 
     while (with(readln().replace(" ", "")) {
-            when {
-                isEmpty() -> ""
-                matches("(([a-zA-Z]+\\d+.*)|(\\d+[a-zA-Z]+.*))".toRegex()) -> "Invalid identifier"
-                matches("/.*".toRegex()) -> command(this)
-                matches("[a-zA-Z]+=.*".toRegex()) -> assigment(this)
-                else -> expression(this)
+            try {
+                when {
+                    isEmpty() -> ""
+                    matches("(.*[a-zA-Z]+\\d+.*)|(.*\\d+[a-zA-Z]+.*)".toRegex()) -> "Invalid identifier"
+                    matches("/.*".toRegex()) -> command(this)
+                    matches("[a-zA-Z]+=.*".toRegex()) -> assigment(this)
+                    else -> expression(this)
+                }
+            } catch (e: Exception) {
+                e.message
             }
         }.apply {
             if (this != "") println(this)
@@ -24,28 +29,56 @@ fun main() {
 }
 
 fun expression(s: String): String {
-    return with(s) {
+    val innerParentheses: P = P.compile("\\([^()]+\\)")
+    var matcher = innerParentheses.matcher(s)
+    var str = s
+    return with(str) {
         when {
-            matches("(\\d+[a-zA-Z]+.*) | ([a-zA-Z]+\\d+.*)".toRegex()) -> "Invalid identifier"
-            !matches("[-+]?(\\d+|[a-zA-Z]+)+(([+-]+(\\d+|[a-zA-Z]+))?)*".toRegex()) -> "Invalid expression"
+            checkBraces(this) -> throw Exception("Invalid expression")
+            contains("(") -> {
+                str = this
+                while (str.contains("(")) {
+                    matcher.find()
+                    str = str.replaceFirst(
+                        "\\([^()]+\\)".toRegex(),
+                        expression(matcher.group(0).replace("(", "").replace(")", ""))
+                    )
+                    matcher = innerParentheses.matcher(str)
+                }
+                expression(str)
+            }
+            !matches("[-+]?(\\d+|[a-zA-Z]+)+(((([*/][-]*)|[+-]+)(\\d+|[a-zA-Z]+))?)*".toRegex()) -> "Invalid expression"
             else -> {
                 var result = s
                 val validName: P = P.compile("[a-zA-z]+")
-                var matcher = validName.matcher(result)
+                matcher = validName.matcher(result)
                 while (matcher.find()) {
                     if (variables.contains(matcher.group(0))) {
                         result = result.replaceFirst(matcher.group(0), variables[matcher.group(0)].toString())
                         matcher = validName.matcher(result)
-
                     } else {
-                        return "Unknown variable"
-
+                        throw Exception("Unknown variable")
                     }
                 }
                 result = result.replace("(--)+".toRegex(), "+")
                     .replace("\\++".toRegex(), "+")
                     .replace("\\+-|-\\+".toRegex(), "-")
-                    .replace("\\+".toRegex(), " ")
+
+                val mulOrDiv: P = P.compile("\\d+[*/][-]*\\d+")
+                matcher = mulOrDiv.matcher(result)
+                while (matcher.find()) {
+                    val expr = matcher.group(0)
+                    val op = if (expr.contains("*")) BigInteger::multiply else BigInteger::div
+                    result = result.replaceFirst(
+                        expr, op(
+                            BigInteger(expr.split("[*/]".toRegex())[0]),
+                            BigInteger(expr.split("[*/]".toRegex())[1])
+                        ).toString()
+                    )
+                    matcher = mulOrDiv.matcher(result)
+                }
+
+                result = result.replace("\\+".toRegex(), " ")
                     .replace("(?<=\\d)-".toRegex(), " -")
                     .split(" ")
                     .sumOf { it.toInt() }.toString()
@@ -54,6 +87,15 @@ fun expression(s: String): String {
         }
 
     }
+}
+
+fun checkBraces(s: String): Boolean {
+    if (s.count { it == '(' } != s.count { it == ')' }) return true
+    var str = s
+    while (str.replace("\\([^()]+\\)".toRegex(), "") != str) {
+        str = str.replace("\\([^()]+\\)".toRegex(), "")
+    }
+    return str.count { it == ')' } > 0
 }
 
 val variables = mutableMapOf<String, Int>()
@@ -80,6 +122,6 @@ fun assigment(s: String): String {
 
 fun command(s: String): String = when (s) {
     "/exit" -> "Bye!"
-    "/help" -> "The program calculates the sum an sub of numbers"
+    "/help" -> "The program calculates any expression"
     else -> "Unknown command"
 }
