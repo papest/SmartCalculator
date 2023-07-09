@@ -1,6 +1,7 @@
 package calculator
 
 import java.math.BigInteger
+import kotlin.reflect.KFunction2
 import java.util.regex.Pattern as P
 
 fun main() {
@@ -63,25 +64,19 @@ fun expression(s: String): String {
                 result = result.replace("(--)+".toRegex(), "+")
                     .replace("\\++".toRegex(), "+")
                     .replace("\\+-|-\\+".toRegex(), "-")
-
-                val mulOrDiv: P = P.compile("\\d+[*/][-]*\\d+")
-                matcher = mulOrDiv.matcher(result)
-                while (matcher.find()) {
-                    val expr = matcher.group(0)
-                    val op = if (expr.contains("*")) BigInteger::multiply else BigInteger::div
-                    result = result.replaceFirst(
-                        expr, op(
-                            BigInteger(expr.split("[*/]".toRegex())[0]),
-                            BigInteger(expr.split("[*/]".toRegex())[1])
-                        ).toString()
-                    )
-                    matcher = mulOrDiv.matcher(result)
-                }
-
-                result = result.replace("\\+".toRegex(), " ")
-                    .replace("(?<=\\d)-".toRegex(), " -")
-                    .split(" ")
-                    .sumOf { it.toInt() }.toString()
+                result = matchingAndCounting(
+                    "\\d+[*/][-]*\\d+",
+                    { exp: String -> if (exp.contains("*")) BigInteger::multiply else BigInteger::div },
+                    result,
+                    "[*/]"
+                )
+                result = result.replace("\\+-|-\\+".toRegex(), "-")
+                result = matchingAndCounting(
+                    "[-]*\\d+[+-]\\d+",
+                    { exp: String -> if (exp.matches("[-]*\\d+[+]\\d+".toRegex())) BigInteger::add else BigInteger::subtract },
+                    result,
+                    "([+]|((?<=\\d)-))"
+                )
                 result
             }
         }
@@ -98,7 +93,7 @@ fun checkBraces(s: String): Boolean {
     return str.count { it == ')' } > 0
 }
 
-val variables = mutableMapOf<String, Int>()
+val variables = mutableMapOf<String, String>()
 fun assigment(s: String): String {
     return with(s) {
         val pos = indexOf('=')
@@ -108,7 +103,7 @@ fun assigment(s: String): String {
                 .run {
 
                     if (matches("-?\\d+".toRegex())) {
-                        variables[name] = this.toInt()
+                        variables[name] = this
                         ""
                     } else {
                         "Invalid assigment"
@@ -124,4 +119,29 @@ fun command(s: String): String = when (s) {
     "/exit" -> "Bye!"
     "/help" -> "The program calculates any expression"
     else -> "Unknown command"
+}
+
+fun matchingAndCounting(
+    matchString: String,
+    operation: (String) -> KFunction2<BigInteger, BigInteger, BigInteger> = { exp: String ->
+        if (exp.contains("*")) BigInteger::multiply else BigInteger::div
+    },
+    expr: String,
+    ops: String
+): String {
+    val pattern: P = P.compile(matchString)
+    var result = expr
+    var matcher = pattern.matcher(result)
+    while (matcher.find()) {
+        val expr = matcher.group(0)
+        val op = operation(expr)
+        result = result.replaceFirst(
+            expr, op(
+                BigInteger(expr.split(ops.toRegex())[0]),
+                BigInteger(expr.split(ops.toRegex())[1])
+            ).toString()
+        )
+        matcher = pattern.matcher(result)
+    }
+    return result
 }
